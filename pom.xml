@@ -9,9 +9,9 @@
   <name>Misc</name>
   <description>Misc</description>
 
-
   <properties>
-    <keycloak.version>2.5.1.Final</keycloak.version>
+    <keycloak.version>11.0.3</keycloak.version>
+    <version.org.jboss.spec.jboss.javaee7>1.1.1.Final</version.org.jboss.spec.jboss.javaee7>
   </properties>
 
   <modules>
@@ -31,7 +31,7 @@
       <dependency>
         <groupId>org.jboss.spec</groupId>
         <artifactId>jboss-javaee-7.0</artifactId>
-        <version>1.0.3.Final</version>
+        <version>${version.org.jboss.spec.jboss.javaee7}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
