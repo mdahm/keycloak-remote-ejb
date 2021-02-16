@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Hashtable;
-import java.util.stream.Collectors;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -26,7 +25,7 @@ public class RemoteEjbClient
     // Step 1 : Retrieve username+password of user. It can be done anyhow by the application (eg. swing form)
     //        UsernamePasswordHolder usernamePassword = promptUsernamePassword();
     final UsernamePasswordHolder usernamePassword = new UsernamePasswordHolder("john", "password");
-
+    final KeycloakToken unfugToken = new KeycloakToken("john", Collections.singletonList("user"), "jens", "hippe");
 
     System.out.println(
         "Will authenticate with username '" + usernamePassword.username + "' and password '" + usernamePassword.password + "'");
@@ -35,19 +34,26 @@ public class RemoteEjbClient
     final DirectGrantInvoker directGrant = new DirectGrantInvoker(usernamePassword.username, usernamePassword.password);
     final KeycloakToken keycloakToken = directGrant.keycloakAuthenticate();
     System.out.println("Successfully authenticated against Keycloak and retrieved token");
+    System.out.println("User-Info 1:" + directGrant.getUserinfo(keycloakToken));
 
     // Step 3 : Push credentials to clientContext from where ClientInterceptor can retrieve them
-    callRemoteEJB(keycloakToken);
+    callRemoteEJB(keycloakToken, 1);
 
     directGrant.logout(keycloakToken);
-//    callRemoteEJB(new KeycloakToken("john", Collections.singletonList("user"), "jens", "hippe"));
+
+    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
 
     // Dass sollte dann knallen
-    callRemoteEJB(keycloakToken);
+    callRemoteEJB(keycloakToken, 2);
+
+    directGrant.shutdown();
   }
 
-  private static void callRemoteEJB(final KeycloakToken keycloakToken) throws Exception
+  private static void callRemoteEJB(final KeycloakToken keycloakToken, final int number) throws Exception
   {
+    System.out.println("Remote call #" + number);
+
+
     /* Fungiert quasi als Zwischenspeicher für unsere Daten, wird serverseitig vom ServerSecurityInterceptor
      * dann ausgelesen
      */
