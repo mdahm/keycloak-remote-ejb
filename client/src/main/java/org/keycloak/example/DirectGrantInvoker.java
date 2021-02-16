@@ -105,7 +105,7 @@ public class DirectGrantInvoker
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
 
     request.setEntity(form);
-    request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
+//    request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
 
     final String response = checkResponse(_httpClient, request);
     System.out.println("Logout Response: " + response);
