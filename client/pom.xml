@@ -17,19 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.wildfly</groupId>
-                <artifactId>wildfly-ejb-client-bom</artifactId>
-                <version>10.0.0.Final</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-
-    </dependencyManagement>
-
     <dependencies>
         <!-- Import the transaction spec API, we use runtime scope because
             we aren't using any direct reference to the spec API in our client code -->
@@ -152,24 +139,4 @@
         </plugins>
 
     </build>
-
-
-    <profiles>
-        <profile>
-            <id>client</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.5.0</version>
-                        <configuration>
-                            <mainClass>org.keycloak.example.RemoteEjbClient</mainClass>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

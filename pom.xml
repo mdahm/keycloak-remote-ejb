@@ -10,8 +10,10 @@
   <description>Misc</description>
 
   <properties>
-    <keycloak.version>11.0.3</keycloak.version>
+    <keycloak.version>12.0.2</keycloak.version>
     <version.org.jboss.spec.jboss.javaee7>1.1.1.Final</version.org.jboss.spec.jboss.javaee7>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
   <modules>

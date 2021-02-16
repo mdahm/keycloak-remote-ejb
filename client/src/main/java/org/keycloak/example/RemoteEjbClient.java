@@ -20,8 +20,8 @@ public class RemoteEjbClient {
 
     public static void main( String[] args ) throws Exception {
         // Step 1 : Retrieve username+password of user. It can be done anyhow by the application (eg. swing form)
-        UsernamePasswordHolder usernamePassword = promptUsernamePassword();
-        //UsernamePasswordHolder usernamePassword = new UsernamePasswordHolder("john", "password");
+//        UsernamePasswordHolder usernamePassword = promptUsernamePassword();
+        UsernamePasswordHolder usernamePassword = new UsernamePasswordHolder("john", "password");
 
         System.out.println("Will authenticate with username '" + usernamePassword.username + "' and password '" + usernamePassword.password + "'");
 
@@ -53,28 +53,23 @@ public class RemoteEjbClient {
     private static UsernamePasswordHolder promptUsernamePassword() throws IOException {
         System.out.println("Remote EJB client will ask for your username and password and then authenticate against Keycloak and call EJB.");
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)))
+        {
             System.out.print("Username: ");
             String username = reader.readLine();
             System.out.print("Password: ");
             String password = reader.readLine();
 
             return new UsernamePasswordHolder(username, password);
-        } finally {
-            reader.close();
         }
     }
 
 
     /**
      * Looks up and returns the proxy to remote stateless calculator bean
-     *
-     * @return
-     * @throws NamingException
      */
     private static RemoteHello lookupRemoteStatelessHello() throws NamingException {
-        final Hashtable<String, Object> jndiProperties = new Hashtable<String, Object>();
+        final Hashtable<String, Object> jndiProperties = new Hashtable<>();
         jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
         final Context context = new InitialContext(jndiProperties);
         try {
