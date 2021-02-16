@@ -9,20 +9,23 @@ import org.keycloak.example.ejb.KeycloakToken;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class ClientInterceptor implements EJBClientInterceptor {
+public class ClientInterceptor implements EJBClientInterceptor
+{
+  public void handleInvocation(final EJBClientInvocationContext context) throws Exception
+  {
+    final Map<String, Object> contextData = context.getContextData();
+    final Object credential = SecurityActions.securityContextGetCredential();
 
-    public void handleInvocation(EJBClientInvocationContext context) throws Exception {
-        final Map<String, Object> contextData = context.getContextData();
-        final Object credential = SecurityActions.securityContextGetCredential();
-
-        if (credential != null) {
-            contextData.put(KeycloakToken.TOKEN_KEY, credential);
-        }
-
-        context.sendRequest();
+    if (credential != null)
+    {
+      contextData.put(KeycloakToken.TOKEN_KEY, credential);
     }
 
-    public Object handleInvocationResult(EJBClientInvocationContext context) throws Exception {
-        return context.getResult();
-    }
+    context.sendRequest();
+  }
+
+  public Object handleInvocationResult(EJBClientInvocationContext context) throws Exception
+  {
+    return context.getResult();
+  }
 }
