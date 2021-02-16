@@ -12,8 +12,8 @@ import org.keycloak.example.ejb.KeycloakToken;
 public class ClientInterceptor implements EJBClientInterceptor {
 
     public void handleInvocation(EJBClientInvocationContext context) throws Exception {
-        Map<String, Object> contextData = context.getContextData();
-        Object credential = SecurityActions.securityContextGetCredential();
+        final Map<String, Object> contextData = context.getContextData();
+        final Object credential = SecurityActions.securityContextGetCredential();
 
         if (credential != null) {
             contextData.put(KeycloakToken.TOKEN_KEY, credential);

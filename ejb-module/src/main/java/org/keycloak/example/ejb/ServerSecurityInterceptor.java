@@ -37,10 +37,11 @@ public class ServerSecurityInterceptor
         {
           // We have been requested to use an authentication token so now we attempt the switch.
           // This userPrincipal and credential will be found by JAAS login modules
-          SimplePrincipal userPrincipal = new SimplePrincipal(keycloakToken.getUsername());
-          String accessToken = keycloakToken.getToken();
+          final SimplePrincipal userPrincipal = new SimplePrincipal(keycloakToken.getUsername());
+          final String accessToken = keycloakToken.getToken();
+
           stateCache = SecurityActions.pushIdentity(userPrincipal, accessToken);
-          logger.infof("Successfully pushed userPrincipal %s and his credential", userPrincipal.getName());
+          logger.infof("Successfully pushed userPrincipal %s with roles %s his credential", userPrincipal.getName(), keycloakToken.getRoles());
 
         }
         catch (Exception e)
