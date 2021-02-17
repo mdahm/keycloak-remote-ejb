@@ -51,6 +51,7 @@ public class HelloBean implements RemoteHello {
         return "Advanced - Hello " + accessToken.getName();
     }
 
+// JBossCachedAuthenticationManager??
     private SecurityContext getSecurityContext() {
         return AccessController.doPrivileged(
             (PrivilegedAction<SecurityContext>) SecurityContextAssociation::getSecurityContext);

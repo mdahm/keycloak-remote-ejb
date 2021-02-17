@@ -30,8 +30,10 @@ How to have this running
     ````
                 <security-domain name="keycloak-ejb">
                     <authentication>
-                        <login-module code="org.keycloak.adapters.jaas.BearerTokenLoginModule" flag="required">
+                        <login-module code="org.keycloak.example.ejb.BearerTokenLoginModule" flag="required">
                             <module-option name="keycloak-config-file" value="classpath:/keycloak-ejb.json"/>
+                            <module-option name="auth-server-url" value="http://127.0.0.1:8080/auth"/>
+                            <module-option name="realm" value="ejb-demo"/>
                         </login-module>
                         <login-module code="org.keycloak.example.ejb.ConvertKeycloakRolesLoginModule" flag="required"/>
                     </authentication>
