@@ -37,6 +37,12 @@ How to have this running
                     </authentication>
                 </security-domain>
     ````
+Call order:
+
+* Interceptor
+* BearerTokenLoginModule checks/verifies Token
+* ConvertKeycloakRolesLoginModule adds roles to subject
+
 
 5. Run the keycloak server
 

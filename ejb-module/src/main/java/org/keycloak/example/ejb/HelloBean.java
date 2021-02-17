@@ -16,6 +16,7 @@ import org.jboss.ejb3.annotation.SecurityDomain;
 import org.jboss.security.SecurityContext;
 import org.jboss.security.SecurityContextAssociation;
 import org.keycloak.KeycloakPrincipal;
+import org.keycloak.adapters.jaas.RolePrincipal;
 import org.keycloak.representations.AccessToken;
 
 /**
@@ -42,6 +43,7 @@ public class HelloBean implements RemoteHello {
 //        Principal principal = ctx.getCallerPrincipal();
 
         final Subject subject = getSecurityContext().getSubjectInfo().getAuthenticatedSubject();
+        final Set<RolePrincipal> keycloakRoles = subject.getPrincipals(RolePrincipal.class);
         final Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
         final KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
         final AccessToken accessToken = kcPrincipal.getKeycloakSecurityContext().getToken();
