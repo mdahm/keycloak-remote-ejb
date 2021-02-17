@@ -107,6 +107,8 @@ public class DirectGrantInvoker
     request.setEntity(form);
 //    request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
 
+    // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
+
     final String response = checkResponse(_httpClient, request);
     System.out.println("Logout Response: " + response);
   }

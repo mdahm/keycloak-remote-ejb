@@ -15,100 +15,87 @@ import org.jboss.as.security.api.ContextStateCache;
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
-final class SecurityActions {
+final class SecurityActions
+{
+  private SecurityActions()
+  {
+  }
 
-    private SecurityActions() {
-    }
+  static ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception
+  {
+    return connectionSecurityContextActions().pushIdentity(principal, credential);
+  }
 
-    /*
-     * ConnectionSecurityContext Actions
-     */
+  static void popIdentity(final ContextStateCache stateCache)
+  {
+    connectionSecurityContextActions().popIdentity(stateCache);
+  }
 
-    static Collection<Principal> getConnectionPrincipals() {
-        return connectionSecurityContextActions().getConnectionPrincipals();
-    }
+  private static ConnectionSecurityContextActions connectionSecurityContextActions()
+  {
+    return System.getSecurityManager() == null ?
+        ConnectionSecurityContextActions.NON_PRIVILEGED : ConnectionSecurityContextActions.PRIVILEGED;
+  }
 
-    static ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception {
-        return connectionSecurityContextActions().pushIdentity(principal, credential);
-    }
+  private interface ConnectionSecurityContextActions
+  {
+    Collection<Principal> getConnectionPrincipals();
 
-    static void popIdentity(final ContextStateCache stateCache) {
-        connectionSecurityContextActions().popIdentity(stateCache);
-    }
+    ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception;
 
-    private static ConnectionSecurityContextActions connectionSecurityContextActions() {
-        return System.getSecurityManager() == null ? ConnectionSecurityContextActions.NON_PRIVILEGED : ConnectionSecurityContextActions.PRIVILEGED;
-    }
+    void popIdentity(final ContextStateCache stateCache);
 
-    private interface ConnectionSecurityContextActions {
+    ConnectionSecurityContextActions NON_PRIVILEGED = new ConnectionSecurityContextActions()
+    {
+      public Collection<Principal> getConnectionPrincipals()
+      {
+        return ConnectionSecurityContext.getConnectionPrincipals();
+      }
 
-        Collection<Principal> getConnectionPrincipals();
+      @Override
+      public ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception
+      {
+        return ConnectionSecurityContext.pushIdentity(principal, credential);
+      }
 
-        ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception;
+      @Override
+      public void popIdentity(ContextStateCache stateCache)
+      {
+        ConnectionSecurityContext.popIdentity(stateCache);
+      }
+    };
 
-        void popIdentity(final ContextStateCache stateCache);
+    ConnectionSecurityContextActions PRIVILEGED = new ConnectionSecurityContextActions()
+    {
+      final PrivilegedAction<Collection<Principal>> GET_CONNECTION_PRINCIPALS_ACTION = NON_PRIVILEGED::getConnectionPrincipals;
 
-        ConnectionSecurityContextActions NON_PRIVILEGED = new ConnectionSecurityContextActions() {
+      public Collection<Principal> getConnectionPrincipals()
+      {
+        return AccessController.doPrivileged(GET_CONNECTION_PRINCIPALS_ACTION);
+      }
 
-            public Collection<Principal> getConnectionPrincipals() {
-                return ConnectionSecurityContext.getConnectionPrincipals();
-            }
+      @Override
+      public ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception
+      {
+        try
+        {
+          return AccessController.doPrivileged(
+              (PrivilegedExceptionAction<ContextStateCache>) () -> NON_PRIVILEGED.pushIdentity(principal, credential));
+        }
+        catch (final PrivilegedActionException e)
+        {
+          throw e.getException();
+        }
+      }
 
-            @Override
-            public ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception {
-                return ConnectionSecurityContext.pushIdentity(principal, credential);
-            }
-
-            @Override
-            public void popIdentity(ContextStateCache stateCache) {
-                ConnectionSecurityContext.popIdentity(stateCache);
-            }
-
-        };
-
-        ConnectionSecurityContextActions PRIVILEGED = new ConnectionSecurityContextActions() {
-
-            PrivilegedAction<Collection<Principal>> GET_CONNECTION_PRINCIPALS_ACTION = new PrivilegedAction<Collection<Principal>>() {
-
-                @Override
-                public Collection<Principal> run() {
-                    return NON_PRIVILEGED.getConnectionPrincipals();
-                }
-            };
-
-            public Collection<Principal> getConnectionPrincipals() {
-                return AccessController.doPrivileged(GET_CONNECTION_PRINCIPALS_ACTION);
-            }
-
-            @Override
-            public ContextStateCache pushIdentity(final Principal principal, final Object credential) throws Exception {
-                try {
-                    return AccessController.doPrivileged(new PrivilegedExceptionAction<ContextStateCache>() {
-
-                        @Override
-                        public ContextStateCache run() throws Exception {
-                            return NON_PRIVILEGED.pushIdentity(principal, credential);
-                        }
-                    });
-                } catch (PrivilegedActionException e) {
-                    throw e.getException();
-                }
-            }
-
-            @Override
-            public void popIdentity(final ContextStateCache stateCache) {
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-
-                    @Override
-                    public Void run() {
-                        NON_PRIVILEGED.popIdentity(stateCache);
-                        return null;
-                    }
-                });
-
-            }
-
-        };
-
-    }
+      @Override
+      public void popIdentity(final ContextStateCache stateCache)
+      {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+          NON_PRIVILEGED.popIdentity(stateCache);
+          return null;
+        });
+      }
+    };
+  }
 }

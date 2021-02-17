@@ -15,50 +15,60 @@ import org.keycloak.adapters.jaas.RolePrincipal;
 
 /**
  * This login module is supposed to be in the chain after Keycloak BearerTokenLoginModule or DirectAccessGrantsLoginModule.
- *
+ * <p>
  * It just converts Keycloak roles to the Wildfly-specific principal, which Wildfly is able to recognize and
  * establish EJB authorization based on that.
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-public class ConvertKeycloakRolesLoginModule implements LoginModule {
+@SuppressWarnings("unused")
+public class ConvertKeycloakRolesLoginModule implements LoginModule
+{
+  private static final Logger LOGGER = Logger.getLogger(ConvertKeycloakRolesLoginModule.class);
 
-    private static final Logger logger = Logger.getLogger(ConvertKeycloakRolesLoginModule.class);
+  private Subject subject;
 
-    private Subject subject;
+  @Override
+  public void initialize(final Subject subject, final CallbackHandler callbackHandler, final Map<String, ?> sharedState,
+      Map<String, ?> options)
+  {
+    this.subject = subject;
+  }
 
-    @Override
-    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState, Map<String, ?> options) {
-        this.subject = subject;
+  @Override
+  public boolean login()
+  {
+    LOGGER.debug("login");
+    return true;
+  }
+
+  @Override
+  public boolean commit()
+  {
+    final Set<RolePrincipal> kcRoles = subject.getPrincipals(RolePrincipal.class);
+    LOGGER.info("commit invoked. Keycloak roles: " + kcRoles);
+
+    final SimpleGroup wfRoles = new SimpleGroup("Roles");
+    for (RolePrincipal kcRole : kcRoles)
+    {
+      wfRoles.addMember(new SimplePrincipal(kcRole.getName()));
     }
 
-    @Override
-    public boolean login() throws LoginException {
-        return true;
-    }
+    subject.getPrincipals().add(wfRoles);
 
-    @Override
-    public boolean commit() throws LoginException {
-        Set<RolePrincipal> kcRoles = subject.getPrincipals(RolePrincipal.class);
-        logger.info("commit invoked. Keycloak roles: " + kcRoles);
+    return true;
+  }
 
-        SimpleGroup wfRoles = new SimpleGroup("Roles");
-        for (RolePrincipal kcRole : kcRoles) {
-            wfRoles.addMember(new SimplePrincipal(kcRole.getName()));
-        }
+  @Override
+  public boolean abort()
+  {
+    return true;
+  }
 
-        subject.getPrincipals().add(wfRoles);
-
-        return true;
-    }
-
-    @Override
-    public boolean abort() throws LoginException {
-        return true;
-    }
-
-    @Override
-    public boolean logout() throws LoginException {
-        return true;
-    }
+  @Override
+  public boolean logout()
+  {
+    LOGGER.debug("logout");
+    return true;
+  }
 }

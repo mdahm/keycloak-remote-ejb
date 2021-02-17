@@ -2,9 +2,7 @@ package org.keycloak.example.ejb;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
-
-import org.keycloak.representations.AccessTokenResponse;
+import java.util.Objects;
 
 /**
  * Username + token sent from remote EJB client to the Wildfly
@@ -24,6 +22,11 @@ public class KeycloakToken implements Serializable
 
   public KeycloakToken(final String username, final List<String> roles, final String token, final String refreshToken)
   {
+    assert username != null : "username must not be null";
+    assert roles != null : "roles must not be null";
+    assert token != null : "token must not be null";
+    assert refreshToken != null : "refreshToken must not be null";
+
     this.username = username;
     this.roles = roles;
     this.token = token;
@@ -48,5 +51,23 @@ public class KeycloakToken implements Serializable
   public String getToken()
   {
     return token;
+  }
+
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (this == o)
+    { return true; }
+    if (!(o instanceof KeycloakToken))
+    { return false; }
+
+    final KeycloakToken that = (KeycloakToken) o;
+    return token.equals(that.token);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(token);
   }
 }

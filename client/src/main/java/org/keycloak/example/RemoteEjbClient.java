@@ -19,7 +19,6 @@ import org.keycloak.example.ejb.RemoteHello;
  */
 public class RemoteEjbClient
 {
-
   public static void main(String[] args) throws Exception
   {
     // Step 1 : Retrieve username+password of user. It can be done anyhow by the application (eg. swing form)
@@ -41,7 +40,7 @@ public class RemoteEjbClient
 
     directGrant.logout(keycloakToken);
 
-    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
+//    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
 
     // Dass sollte dann knallen
     callRemoteEJB(keycloakToken, 2);
@@ -52,7 +51,6 @@ public class RemoteEjbClient
   private static void callRemoteEJB(final KeycloakToken keycloakToken, final int number) throws Exception
   {
     System.out.println("Remote call #" + number);
-
 
     /* Fungiert quasi als Zwischenspeicher für unsere Daten, wird serverseitig vom ServerSecurityInterceptor
      * dann ausgelesen

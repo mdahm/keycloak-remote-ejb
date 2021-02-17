@@ -21,42 +21,36 @@ import org.keycloak.representations.AccessToken;
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
+@SuppressWarnings("rawtypes")
 @Stateless
 @Remote(RemoteHello.class)
 @RolesAllowed({ "user" })
 @SecurityDomain("keycloak-ejb")
 public class HelloBean implements RemoteHello {
-
-    // Inject the Session Context
     @Resource
     private SessionContext ctx;
 
     @Override
     public String helloSimple() {
-        Principal principal = ctx.getCallerPrincipal();
+        final Principal principal = ctx.getCallerPrincipal();
         return "Simple - Hello " + principal.getName();
     }
 
     // Use KEycloak-specific API to retrieve KeycloakPrincipal and the underlying token from it
     @Override
     public String helloAdvanced() {
-        Principal principal = ctx.getCallerPrincipal();
+//        Principal principal = ctx.getCallerPrincipal();
 
-        Subject subject = getSecurityContext().getSubjectInfo().getAuthenticatedSubject();
-        Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
-        KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
-        AccessToken accessToken = kcPrincipal.getKeycloakSecurityContext().getToken();
+        final Subject subject = getSecurityContext().getSubjectInfo().getAuthenticatedSubject();
+        final Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
+        final KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
+        final AccessToken accessToken = kcPrincipal.getKeycloakSecurityContext().getToken();
 
         return "Advanced - Hello " + accessToken.getName();
     }
 
-
     private SecurityContext getSecurityContext() {
-        return AccessController.doPrivileged(new PrivilegedAction<SecurityContext>() {
-            @Override
-            public SecurityContext run() {
-                return SecurityContextAssociation.getSecurityContext();
-            }
-        });
+        return AccessController.doPrivileged(
+            (PrivilegedAction<SecurityContext>) SecurityContextAssociation::getSecurityContext);
     }
 }

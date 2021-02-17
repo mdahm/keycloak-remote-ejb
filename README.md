@@ -53,3 +53,19 @@ mvn exec:java -Pclient
 If you login as user `john` with password `password`, you should be able to see that both EJB methods were successfully invoked.
 When login as `mary` with password `password`, you should see the exception due to missing role `user` .
 
+# Secure application
+
+    <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
+            <secure-deployment name="ejb-module.jar">
+                <realm>ejb-demo</realm>
+                <resource>ejb-client</resource>
+                <use-resource-role-mappings>false</use-resource-role-mappings>
+                <public-client>true</public-client>
+                <auth-server-url>http://localhost:8080/auth/</auth-server-url>
+                <ssl-required>EXTERNAL</ssl-required>
+                <verify-token-audience>true</verify-token-audience>
+            </secure-deployment>
+        </subsystem>
+
+
+“DirectAccessGrantsLoginModule”, but nothing mentioned on “KeycloakLoginModule
