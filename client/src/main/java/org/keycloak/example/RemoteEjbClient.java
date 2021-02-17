@@ -10,6 +10,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.jboss.ejb.client.EJBClientContext;
 import org.keycloak.example.ejb.HelloBean;
 import org.keycloak.example.ejb.KeycloakToken;
 import org.keycloak.example.ejb.RemoteHello;
@@ -21,6 +22,12 @@ public class RemoteEjbClient
 {
   public static void main(String[] args) throws Exception
   {
+    final EJBClientContext ejbClientContext = EJBClientContext.getCurrent()
+        // Two ways to add interceptor: Either programatically:
+        //        .withAddedInterceptors(new ClientInterceptor())
+        // or via META-INF/services/org.jboss.ejb.client.EJBClientInterceptor file
+        ;
+
     // Step 1 : Retrieve username+password of user. It can be done anyhow by the application (eg. swing form)
     //        UsernamePasswordHolder usernamePassword = promptUsernamePassword();
     final UsernamePasswordHolder usernamePassword = new UsernamePasswordHolder("john", "password");
@@ -36,24 +43,24 @@ public class RemoteEjbClient
     System.out.println("User-Info 1:" + directGrant.getUserinfo(keycloakToken));
 
     // Step 3 : Push credentials to clientContext from where ClientInterceptor can retrieve them
-    callRemoteEJB(keycloakToken, 1);
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken, 1));
 
     directGrant.logout(keycloakToken);
 
-//    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
+    //    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
 
     // Dass sollte dann knallen
-    callRemoteEJB(keycloakToken, 2);
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken, 2));
 
     directGrant.shutdown();
   }
 
-  private static void callRemoteEJB(final KeycloakToken keycloakToken, final int number) throws Exception
+  private static Void callRemoteEJB(final KeycloakToken keycloakToken, final int number) throws Exception
   {
     System.out.println("Remote call #" + number);
 
-    /* Fungiert quasi als Zwischenspeicher für unsere Daten, wird serverseitig vom ServerSecurityInterceptor
-     * dann ausgelesen
+    /* Fungiert quasi als Zwischenspeicher für unsere Daten, wird vom ClientInteceptor ausgelesen und den InvocationContext
+     * hinzugefügt. Und von dort wird es dann serverseitig vom ServerSecurityInterceptor ausgelesen
      */
     SecurityActions.securityContextSetPrincipalCredential(null, keycloakToken);
 
@@ -74,6 +81,8 @@ public class RemoteEjbClient
     {
       SecurityActions.clearSecurityContext();
     }
+
+    return null;
   }
 
   private static UsernamePasswordHolder promptUsernamePassword() throws IOException
