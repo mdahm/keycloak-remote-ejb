@@ -2,6 +2,11 @@ package org.keycloak.example.ejb;
 
 import java.util.Map;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.CDI;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 
@@ -9,6 +14,8 @@ import org.jboss.logging.Logger;
 import org.keycloak.adapters.jaas.AbstractKeycloakLoginModule;
 import org.keycloak.common.VerificationException;
 import org.keycloak.representations.adapters.config.AdapterConfig;
+
+import javax.enterprise.inject.spi.BeanManager;
 
 /**
  * Token based Login module, which allows to authenticate Keycloak access token in environments.
@@ -33,6 +40,8 @@ public class BearerTokenLoginModule extends AbstractKeycloakLoginModule
   {
     super.initialize(subject, callbackHandler, sharedState, options);
 
+    final KeyCloakDeploymentHolder holder = lookupDeploymentHolderBean();
+
     if (deployment != null)
     {
       if (options.containsKey(AUTH_SERVER_URL))
@@ -51,7 +60,18 @@ public class BearerTokenLoginModule extends AbstractKeycloakLoginModule
       {
         deployment.setResourceName((String) options.get(RESOURCE));
       }
+
+      holder.setKeycloakDeployment(deployment);
     }
+  }
+
+  private KeyCloakDeploymentHolder lookupDeploymentHolderBean()
+  {
+    final BeanManager beanManager = CDI.current().getBeanManager();
+    final Bean<?> bean = beanManager.getBeans(KeyCloakDeploymentHolder.NAME).iterator().next();
+    final CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
+
+    return (KeyCloakDeploymentHolder) beanManager.getReference(bean, KeyCloakDeploymentHolder.class, creationalContext);
   }
 
   @Override
