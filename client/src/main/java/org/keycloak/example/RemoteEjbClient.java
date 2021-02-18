@@ -76,6 +76,8 @@ public class RemoteEjbClient
 
       final String hello2 = remoteHello.helloAdvanced();
       System.out.println("HelloAdvanced invocation: " + hello2);
+
+      remoteHello.logout();
     }
     finally
     {

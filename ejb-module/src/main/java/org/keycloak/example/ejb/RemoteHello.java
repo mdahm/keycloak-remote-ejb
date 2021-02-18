@@ -7,5 +7,7 @@ public interface RemoteHello
 {
   String helloSimple();
 
+  void logout();
+
   String helloAdvanced();
 }

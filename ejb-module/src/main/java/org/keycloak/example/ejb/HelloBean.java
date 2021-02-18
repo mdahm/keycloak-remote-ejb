@@ -10,11 +10,15 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.security.auth.Subject;
 
 import org.jboss.ejb3.annotation.SecurityDomain;
+import org.jboss.security.AuthenticationManager;
 import org.jboss.security.SecurityContext;
 import org.jboss.security.SecurityContextAssociation;
+import org.jboss.security.SimplePrincipal;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.jaas.RolePrincipal;
 import org.keycloak.representations.AccessToken;
@@ -27,33 +31,57 @@ import org.keycloak.representations.AccessToken;
 @Remote(RemoteHello.class)
 @RolesAllowed({ "user" })
 @SecurityDomain("keycloak-ejb")
-public class HelloBean implements RemoteHello {
-    @Resource
-    private SessionContext ctx;
+@Interceptors({ ServerSecurityInterceptor.class })
+public class HelloBean implements RemoteHello
+{
+  @Resource
+  private SessionContext ctx;
 
-    @Override
-    public String helloSimple() {
-        final Principal principal = ctx.getCallerPrincipal();
-        return "Simple - Hello " + principal.getName();
-    }
+  @Inject
+  private KeyCloakTokenStore keyCloakTokenStore;
 
-    // Use KEycloak-specific API to retrieve KeycloakPrincipal and the underlying token from it
-    @Override
-    public String helloAdvanced() {
-//        Principal principal = ctx.getCallerPrincipal();
+  @Override
+  public String helloSimple()
+  {
+    final Principal principal = ctx.getCallerPrincipal();
+    return "Simple - Hello " + principal.getName();
+  }
 
-        final Subject subject = getSecurityContext().getSubjectInfo().getAuthenticatedSubject();
-        final Set<RolePrincipal> keycloakRoles = subject.getPrincipals(RolePrincipal.class);
-        final Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
-        final KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
-        final AccessToken accessToken = kcPrincipal.getKeycloakSecurityContext().getToken();
+  @Override
+  public void logout()
+  {
+    final SecurityContext context = getSecurityContext();
+    final AuthenticationManager authenticationManager = context.getAuthenticationManager();
+    final Subject subject = context.getSubjectInfo().getAuthenticatedSubject();
+    final Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
+    final KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
+    final String token = kcPrincipal.getKeycloakSecurityContext().getTokenString();
 
-        return "Advanced - Hello " + accessToken.getName();
-    }
+    keyCloakTokenStore.invalidate(token);
+    authenticationManager.logout(kcPrincipal, subject);
+  }
 
-// JBossCachedAuthenticationManager??
-    private SecurityContext getSecurityContext() {
-        return AccessController.doPrivileged(
-            (PrivilegedAction<SecurityContext>) SecurityContextAssociation::getSecurityContext);
-    }
+  // Use Keycloak-specific API to retrieve KeycloakPrincipal and the underlying token from it
+  @Override
+  public String helloAdvanced()
+  {
+    final SecurityContext context = getSecurityContext();
+    final AuthenticationManager authenticationManager = context.getAuthenticationManager();
+    final Subject subject = context.getSubjectInfo().getAuthenticatedSubject();
+    final Set<SimplePrincipal> principals = subject.getPrincipals(SimplePrincipal.class);
+    //        authenticationManager.logout(principal, subject);
+    final Set<RolePrincipal> keycloakRoles = subject.getPrincipals(RolePrincipal.class);
+    final Set<KeycloakPrincipal> keycloakPrincipals = subject.getPrincipals(KeycloakPrincipal.class);
+    final KeycloakPrincipal kcPrincipal = keycloakPrincipals.iterator().next();
+    final AccessToken accessToken = kcPrincipal.getKeycloakSecurityContext().getToken();
+
+    return "Advanced - Hello " + accessToken.getName();
+  }
+
+  // JBossCachedAuthenticationManager??
+  private SecurityContext getSecurityContext()
+  {
+    return AccessController.doPrivileged(
+        (PrivilegedAction<SecurityContext>) SecurityContextAssociation::getSecurityContext);
+  }
 }

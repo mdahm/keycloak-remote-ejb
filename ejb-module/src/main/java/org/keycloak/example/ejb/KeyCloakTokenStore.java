@@ -1,26 +1,48 @@
 package org.keycloak.example.ejb;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 
+import org.jboss.logging.Logger;
+
 @Singleton
 @Lock(LockType.WRITE)
 public class KeyCloakTokenStore
 {
-  private final Set<KeycloakToken> registeredTokens = new HashSet<>();
+  private static final Logger LOGGER = Logger.getLogger(KeyCloakTokenStore.class);
+
+  private final Map<String, KeycloakToken> registeredTokens = new HashMap<>();
 
   /**
-   * Return true if given token needs to be checked against KeyCloak server
+   * Return true if given keycloakToken needs to be checked against KeyCloak server, i.e. is new
    */
-  public boolean checkToken(final KeycloakToken token) {
-    assert token != null : "token must not be null";
+  public boolean registerToken(final KeycloakToken keycloakToken)
+  {
+    assert keycloakToken != null : "keycloakToken must not be null";
 
-    return registeredTokens.add(token);
+    final String token = keycloakToken.getToken();
+    final boolean result = !registeredTokens.containsKey(token);
+
+    registeredTokens.putIfAbsent(token, keycloakToken);
+
+    LOGGER.info("Register KC Token for user " + keycloakToken.getUsername());
+
+    return result;
   }
 
+  public void invalidate(final String token)
+  {
+    assert token != null : "token must not be null";
 
+    if (!registeredTokens.containsKey(token))
+    {
+      LOGGER.warn("Invalidate: Unknown token");
+    }
+
+    registeredTokens.remove(token);
+  }
 }

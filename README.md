@@ -39,12 +39,6 @@ How to have this running
                     </authentication>
                 </security-domain>
     ````
-Call order:
-
-* Interceptor
-* BearerTokenLoginModule checks/verifies Token
-* ConvertKeycloakRolesLoginModule adds roles to subject
-
 
 5. Run the keycloak server
 
@@ -52,16 +46,23 @@ Call order:
 
 7. In keycloak admin console, import realm from file `testrealm.json` .
 
-8. Run the client. You can either run class `RemoteEjbClient` from IDE or use maven command like this:
-    ````
-cd client
-mvn exec:java -Pclient
-    ````
+8. Run the client `RemoteEjbClient` 
 
 If you login as user `john` with password `password`, you should be able to see that both EJB methods were successfully invoked.
 When login as `mary` with password `password`, you should see the exception due to missing role `user` .
 
-# Secure application
+# Call chain
+
+Call chain order:
+
+1. ServerSecurityContainerInterceptor
+2. SecurityInterceptor (JBossCachedAuthenticationManager)
+3. BearerTokenLoginModule checks/verifies Token
+4. ConvertKeycloakRolesLoginModule adds roles to subject
+5. ServerSecurityInterceptor
+6. Bean
+
+# Secure application????
 
     <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
             <secure-deployment name="ejb-module.jar">
