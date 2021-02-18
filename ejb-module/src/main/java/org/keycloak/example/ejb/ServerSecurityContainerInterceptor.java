@@ -32,16 +32,10 @@ public class ServerSecurityContainerInterceptor
     if (contextData.containsKey(KeycloakToken.TOKEN_KEY))
     {
       final KeycloakToken keycloakToken = (KeycloakToken) contextData.get(KeycloakToken.TOKEN_KEY);
+      ContextStateCache stateCache = null;
+
       LOGGER.info("Successfully found KeycloakToken passed from client");
 
-//      final boolean validate = keyCloakTokenStore.registerToken(keycloakToken);
-//
-//      if (validate)
-//      {
-//        LOGGER.info("KeyCloak token for user " + keycloakToken.getUsername() + " needs to be validated!");
-//      }
-
-      ContextStateCache stateCache = null;
       try
       {
         try
@@ -72,11 +66,10 @@ public class ServerSecurityContainerInterceptor
           SecurityActions.popIdentity(stateCache);
         }
       }
-
     }
     else
     {
-      LOGGER.warn("No Keycloak token found");
+      LOGGER.warn("No Keycloak token found!");
       return invocationContext.proceed();
     }
   }
