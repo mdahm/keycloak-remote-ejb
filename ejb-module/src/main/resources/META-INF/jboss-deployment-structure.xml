@@ -20,9 +20,10 @@
             <module name="org.jboss.remoting3"/>
             <module name="org.jboss.as.core-security-api"/>
             <module name="org.jboss.as.security-api"/>
+            <module name="org.keycloak.keycloak-common"/>
             <module name="org.keycloak.keycloak-core"/>
             <module name="org.keycloak.keycloak-adapter-core"/>
+            <module name="org.apache.httpcomponents.core"/>
         </dependencies>
     </deployment>
-
 </jboss-deployment-structure>

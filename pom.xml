@@ -1,74 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.keycloak.example</groupId>
-  <artifactId>remote-ejb-example-parent</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.keycloak.example</groupId>
+    <artifactId>remote-ejb-example-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <name>Misc</name>
-  <description>Misc</description>
+      <properties>
+        <keycloak.version>12.0.2</keycloak.version>
+        <version.org.jboss.spec.jboss.javaee7>1.1.1.Final</version.org.jboss.spec.jboss.javaee7>
+        <version.wildfly.bom>22.0.1.Final</version.wildfly.bom>
+        <version.wildfly-core-security-api>14.0.1.Final</version.wildfly-core-security-api>
 
-  <properties>
-    <keycloak.version>12.0.2</keycloak.version>
-    <version.org.jboss.spec.jboss.javaee7>1.1.1.Final</version.org.jboss.spec.jboss.javaee7>
-    <version.wildfly.bom>22.0.1.Final</version.wildfly.bom>
-    <version.wildfly-core-security-api>14.0.1.Final</version.wildfly-core-security-api>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-  </properties>
+    <modules>
+        <module>ejb-module</module>
+        <module>client</module>
+    </modules>
 
-  <modules>
-    <module>ejb-module</module>
-    <module>client</module>
-  </modules>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Define the version of the JBoss Java EE APIs we want to use -->
+            <!-- JBoss distributes a complete set of Java EE APIs including
+                a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
+                a collection) of artifacts. We use this here so that we always get the correct
+                versions of artifacts. Here we use the jboss-javaee-7.0 stack (you can
+                read this as the JBoss stack of the Java EE APIs). You can actually
+                use this stack with any version of WildFly that implements Java EE. -->
+            <dependency>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-7.0</artifactId>
+                <version>${version.org.jboss.spec.jboss.javaee7}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-  <dependencyManagement>
-    <dependencies>
-      <!-- Define the version of the JBoss Java EE APIs we want to use -->
-      <!-- JBoss distributes a complete set of Java EE APIs including
-          a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
-          a collection) of artifacts. We use this here so that we always get the correct
-          versions of artifacts. Here we use the jboss-javaee-7.0 stack (you can
-          read this as the JBoss stack of the Java EE APIs). You can actually
-          use this stack with any version of WildFly that implements Java EE. -->
-      <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-7.0</artifactId>
-        <version>${version.org.jboss.spec.jboss.javaee7}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+            <!-- Needed for server -->
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-ejb-client-bom</artifactId>
+                <version>${version.wildfly.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-      <!-- Needed for server -->
-      <dependency>
-        <groupId>org.wildfly</groupId>
-        <artifactId>wildfly-ejb-client-bom</artifactId>
-        <version>${version.wildfly.bom}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-core</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-adapter-core</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
 
-      <dependency>
-        <groupId>org.keycloak</groupId>
-        <artifactId>keycloak-core</artifactId>
-        <version>${keycloak.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.keycloak</groupId>
-        <artifactId>keycloak-adapter-core</artifactId>
-        <version>${keycloak.version}</version>
-      </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.2</version>
+            </dependency>
 
-      <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.2</version>
-      </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-    </dependencies>
-  </dependencyManagement>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <source>11</source>
+                    <target>11</target>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

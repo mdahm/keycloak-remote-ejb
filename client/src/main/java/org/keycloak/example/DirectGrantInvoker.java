@@ -101,7 +101,7 @@ public class DirectGrantInvoker
     final List<NameValuePair> formparams = new ArrayList<>();
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, KEYCLOAK_CLIENT));
     formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
-    formparams.add(new BasicNameValuePair("username", username));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, username));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
 
     request.setEntity(form);

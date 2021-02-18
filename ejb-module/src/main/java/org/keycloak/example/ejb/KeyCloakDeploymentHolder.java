@@ -1,7 +1,6 @@
 package org.keycloak.example.ejb;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 
 import org.keycloak.adapters.KeycloakDeployment;
