@@ -9,6 +9,7 @@ import javax.interceptor.InvocationContext;
 import org.jboss.as.security.api.ContextStateCache;
 import org.jboss.logging.Logger;
 import org.jboss.security.SimplePrincipal;
+import org.keycloak.example.KeycloakToken;
 
 /**
  * The server side security interceptor responsible for handling any security token propagated from the client.

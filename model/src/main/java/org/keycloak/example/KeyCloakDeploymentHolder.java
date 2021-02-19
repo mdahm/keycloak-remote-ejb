@@ -1,4 +1,4 @@
-package org.keycloak.example.ejb;
+package org.keycloak.example;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;

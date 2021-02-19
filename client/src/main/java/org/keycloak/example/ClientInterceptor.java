@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.jboss.ejb.client.EJBClientInterceptor;
 import org.jboss.ejb.client.EJBClientInvocationContext;
-import org.keycloak.example.ejb.KeycloakToken;
+import org.keycloak.example.KeycloakToken;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>

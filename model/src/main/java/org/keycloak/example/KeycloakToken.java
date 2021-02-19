@@ -1,4 +1,4 @@
-package org.keycloak.example.ejb;
+package org.keycloak.example;
 
 import java.io.Serializable;
 import java.util.List;

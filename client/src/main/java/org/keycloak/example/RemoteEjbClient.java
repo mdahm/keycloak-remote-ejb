@@ -12,7 +12,7 @@ import javax.naming.NamingException;
 
 import org.jboss.ejb.client.EJBClientContext;
 import org.keycloak.example.ejb.HelloBean;
-import org.keycloak.example.ejb.KeycloakToken;
+import org.keycloak.example.KeycloakToken;
 import org.keycloak.example.ejb.RemoteHello;
 
 /**
@@ -117,12 +117,12 @@ public class RemoteEjbClient
       // without the .ear suffix. However, the application name could be overridden in the application.xml of the
       // EJB deployment on the server.
       // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
-      final String appName = "";
+      final String appName = "keycloak-remote-ejb";
       // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
       // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
       // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
       // jboss-as-ejb-remote-app
-      final String moduleName = "ejb-module";
+      final String moduleName = "org.keycloak.example-ejb-module-0.1-SNAPSHOT";
       // AS7 allows each deployment to have an (optional) distinct name. We haven't specified a distinct name for
       // our EJB deployment, so this is an empty string
       final String distinctName = "";

@@ -21,7 +21,7 @@ import org.keycloak.common.VerificationException;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.common.util.StreamUtil;
 import org.keycloak.constants.ServiceUrlConstants;
-import org.keycloak.example.ejb.KeycloakToken;
+import org.keycloak.example.KeycloakToken;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.util.JsonSerialization;

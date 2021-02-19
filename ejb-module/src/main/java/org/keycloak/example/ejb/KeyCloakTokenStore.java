@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
+import org.keycloak.example.KeycloakToken;
 
 import org.jboss.logging.Logger;
 

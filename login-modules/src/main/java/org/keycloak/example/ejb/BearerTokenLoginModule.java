@@ -5,14 +5,13 @@ import java.util.Map;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.CDI;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.jboss.logging.Logger;
 import org.keycloak.adapters.jaas.AbstractKeycloakLoginModule;
 import org.keycloak.common.VerificationException;
+import org.keycloak.example.KeyCloakDeploymentHolder;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
 import javax.enterprise.inject.spi.BeanManager;

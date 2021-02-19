@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
 
       <properties>
-        <keycloak.version>12.0.2</keycloak.version>
+        <keycloak.version>12.0.3</keycloak.version>
         <version.org.jboss.spec.jboss.javaee7>1.1.1.Final</version.org.jboss.spec.jboss.javaee7>
         <version.wildfly.bom>22.0.1.Final</version.wildfly.bom>
         <version.wildfly-core-security-api>14.0.1.Final</version.wildfly-core-security-api>
@@ -19,8 +19,11 @@
     </properties>
 
     <modules>
+        <module>model</module>
+        <module>login-modules</module>
         <module>ejb-module</module>
         <module>client</module>
+        <module>ear</module>
     </modules>
 
     <dependencyManagement>

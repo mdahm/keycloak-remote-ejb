@@ -29,6 +29,8 @@ import org.keycloak.adapters.KeycloakDeployment;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.common.util.StreamUtil;
 import org.keycloak.constants.ServiceUrlConstants;
+import org.keycloak.example.KeyCloakDeploymentHolder;
+import org.keycloak.example.KeycloakToken;
 
 @Interceptor
 public class ServerSecurityInterceptor
