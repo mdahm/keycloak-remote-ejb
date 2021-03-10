@@ -30,7 +30,7 @@ public class RemoteEjbClient
     // Step 1 : Retrieve username+password of user. It can be done anyhow by the application (eg. swing form)
     //        UsernamePasswordHolder usernamePassword = promptUsernamePassword();
     final UsernamePasswordHolder usernamePassword = new UsernamePasswordHolder("john", "password");
-    final KeycloakToken unfugToken = new KeycloakToken("john", Collections.singletonList("user"), "jens", "hippe");
+    //    final KeycloakToken unfugToken = new KeycloakToken("john", Collections.singletonList("user"), "jens", "hippe");
 
     System.out.println(
         "Will authenticate with username '" + usernamePassword.username + "' and password '" + usernamePassword.password + "'");
@@ -55,7 +55,7 @@ public class RemoteEjbClient
 
     directGrant.logout(keycloakToken2);
 
-//    System.out.println("User-Info 3:" + directGrant.getUserinfo(keycloakToken));
+    //    System.out.println("User-Info 3:" + directGrant.getUserinfo(keycloakToken));
 
     // Das sollte dann knallen
     ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken2, 3));
@@ -119,6 +119,7 @@ public class RemoteEjbClient
     final Hashtable<String, Object> jndiProperties = new Hashtable<>();
     jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
     final Context context = new InitialContext(jndiProperties);
+
     try
     {
       // The app name is the application name of the deployed EJBs. This is typically the ear name
@@ -139,7 +140,16 @@ public class RemoteEjbClient
       // the remote view fully qualified class name
       final String viewClassName = RemoteHello.class.getName();
       // let's do the lookup
-      String lookupKey = "ejb:" + appName + "/" + moduleName + "/" + distinctName + "/" + beanName + "!" + viewClassName;
+      final String lookupKey = "ejb:"
+          + appName
+          + "/"
+          + moduleName
+          + "/"
+          + buildDistinctPath(distinctName)
+          + beanName
+          + "!"
+          + viewClassName;
+
       System.out.println("Lookup for remote EJB bean: " + lookupKey);
       return (RemoteHello) context.lookup(lookupKey);
     }
@@ -147,12 +157,15 @@ public class RemoteEjbClient
     {
       context.close();
     }
+  }
 
+  private static String buildDistinctPath(final String distinctName)
+  {
+    return distinctName.isEmpty() ? "" : distinctName + "/";
   }
 
   private static class UsernamePasswordHolder
   {
-
     private final String username;
     private final String password;
 
@@ -161,7 +174,5 @@ public class RemoteEjbClient
       this.username = username;
       this.password = password;
     }
-
   }
-
 }

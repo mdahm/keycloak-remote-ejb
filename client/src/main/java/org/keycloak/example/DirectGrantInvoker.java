@@ -68,6 +68,7 @@ public class DirectGrantInvoker
     return obtainKeycloakToken(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken());
   }
 
+  @SuppressWarnings("unchecked")
   private KeycloakToken obtainKeycloakToken(final String grantType, final String credential) throws IOException, VerificationException
   {
     final HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
