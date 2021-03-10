@@ -12,7 +12,6 @@ import javax.naming.NamingException;
 
 import org.jboss.ejb.client.EJBClientContext;
 import org.keycloak.example.ejb.HelloBean;
-import org.keycloak.example.KeycloakToken;
 import org.keycloak.example.ejb.RemoteHello;
 
 /**
@@ -38,19 +37,28 @@ public class RemoteEjbClient
 
     // Step 2 : Keycloak DirectGrant (OAuth2 Resource Owner Password Credentials Grant) from the application
     final DirectGrantInvoker directGrant = new DirectGrantInvoker(usernamePassword.username, usernamePassword.password);
-    final KeycloakToken keycloakToken = directGrant.keycloakAuthenticate();
+    final KeycloakToken keycloakToken1 = directGrant.authenticate();
     System.out.println("Successfully authenticated against Keycloak and retrieved token");
-    System.out.println("User-Info 1:" + directGrant.getUserinfo(keycloakToken));
+    System.out.println("User-Info 1:" + directGrant.getUserinfo(keycloakToken1));
 
     // Step 3 : Push credentials to clientContext from where ClientInterceptor can retrieve them
-    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken, 1));
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken1, 1));
 
-    directGrant.logout(keycloakToken);
+    final KeycloakToken keycloakToken2 = directGrant.refresh(keycloakToken1);
+    System.out.println("Successfully refreshed token");
+    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken1));
+    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken2));
 
-    //    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
+    // Step 3 : Push credentials to clientContext from where ClientInterceptor can retrieve them
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken1, 2));
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken2, 2));
+
+    directGrant.logout(keycloakToken2);
+
+//    System.out.println("User-Info 3:" + directGrant.getUserinfo(keycloakToken));
 
     // Das sollte dann knallen
-    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken, 2));
+    ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken2, 3));
 
     directGrant.shutdown();
   }

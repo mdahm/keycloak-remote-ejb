@@ -58,15 +58,24 @@ public class DirectGrantInvoker
     return checkResponse(_httpClient, httpGet);
   }
 
-  @SuppressWarnings("unchecked")
-  public KeycloakToken keycloakAuthenticate() throws IOException, VerificationException
+  public KeycloakToken authenticate() throws IOException, VerificationException
+  {
+    return obtainKeycloakToken(OAuth2Constants.PASSWORD, password);
+  }
+
+  public KeycloakToken refresh(final KeycloakToken keycloakToken) throws IOException, VerificationException
+  {
+    return obtainKeycloakToken(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken());
+  }
+
+  private KeycloakToken obtainKeycloakToken(final String grantType, final String credential) throws IOException, VerificationException
   {
     final HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
         .path(ServiceUrlConstants.TOKEN_PATH).build(KEYCLOAK_REALM));
     final List<NameValuePair> formparams = new ArrayList<>();
     formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, username));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.PASSWORD, password));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE, OAuth2Constants.PASSWORD));
+    formparams.add(new BasicNameValuePair(grantType, credential));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE, grantType));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, KEYCLOAK_CLIENT));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
