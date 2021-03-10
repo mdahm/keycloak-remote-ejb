@@ -37,6 +37,7 @@ public class ServerSecurityInterceptor
 {
   private static final Logger LOGGER = Logger.getLogger(ServerSecurityInterceptor.class);
   public static final String USERINFO_PATH = "/realms/{realm-name}/protocol/openid-connect/userinfo";
+  private static final String KEYCLOAK_SECRET = "6ec720af-70dd-4b7b-8a1f-876f7a42c3b7";
 
   @Inject
   private KeyCloakTokenStore keyCloakTokenStore;
@@ -87,6 +88,7 @@ public class ServerSecurityInterceptor
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, deployment.getResourceName()));
     formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
     formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, keycloakToken.getUsername()));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
 
     request.setEntity(form);
@@ -106,7 +108,8 @@ public class ServerSecurityInterceptor
   {
     final HttpClient client = deployment.getClient();
     final String authServerBaseUrl = deployment.getAuthServerBaseUrl();
-    final URI userInfoUri = KeycloakUriBuilder.fromUri(authServerBaseUrl).path(USERINFO_PATH).build(deployment.getRealm());
+    final URI userInfoUri = KeycloakUriBuilder.fromUri(authServerBaseUrl).path(USERINFO_PATH)
+        .queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(deployment.getRealm());
     final HttpGet request = new HttpGet(userInfoUri);
     request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
     final HttpResponse response = client.execute(request);

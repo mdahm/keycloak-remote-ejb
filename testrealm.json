@@ -57,20 +57,14 @@
   },
   "clients": [
     {
-      "clientId": "ejb-remote",
-      "enabled": true,
-      "bearerOnly": true,
-      "fullScopeAllowed": true
-    },
-    {
       "clientId": "ejb-client",
       "enabled": true,
-      "publicClient": true,
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "6ec720af-70dd-4b7b-8a1f-876f7a42c3b7",
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "fullScopeAllowed": true
     }
   ]
-
-
 }

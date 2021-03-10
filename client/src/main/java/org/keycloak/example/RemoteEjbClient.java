@@ -49,7 +49,7 @@ public class RemoteEjbClient
 
     //    System.out.println("User-Info 2:" + directGrant.getUserinfo(keycloakToken));
 
-    // Dass sollte dann knallen
+    // Das sollte dann knallen
     ejbClientContext.runCallable(() -> callRemoteEJB(keycloakToken, 2));
 
     directGrant.shutdown();

@@ -36,9 +36,11 @@ public class DirectGrantInvoker
   private static final String KEYCLOAK_ROOT = "http://localhost:8080/auth";
   private static final String KEYCLOAK_REALM = "ejb-demo";
   private static final String KEYCLOAK_CLIENT = "ejb-client";
+  private static final String KEYCLOAK_SECRET = "6ec720af-70dd-4b7b-8a1f-876f7a42c3b7";
+
+  private final CloseableHttpClient _httpClient = HttpClientBuilder.create().build();
   private final String username;
   private final String password;
-  private final CloseableHttpClient _httpClient = HttpClientBuilder.create().build();
 
   public DirectGrantInvoker(final String username, final String password)
   {
@@ -65,6 +67,7 @@ public class DirectGrantInvoker
     formparams.add(new BasicNameValuePair("password", password));
     formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE, "password"));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, KEYCLOAK_CLIENT));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
     post.setEntity(form);
 
@@ -102,6 +105,7 @@ public class DirectGrantInvoker
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, KEYCLOAK_CLIENT));
     formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
     formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, username));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
 
     request.setEntity(form);
