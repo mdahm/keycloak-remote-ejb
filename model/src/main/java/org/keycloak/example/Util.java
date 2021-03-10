@@ -1,5 +1,8 @@
 package org.keycloak.example;
 
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+
 public abstract class Util
 {
   private Util()
@@ -12,8 +15,8 @@ public abstract class Util
   public static final String KEYCLOAK_CLIENT = "ejb-client";
   public static final String AUTHORIZATION_HEADER = "Authorization";
 
-  public static String createAuthorizationValue(final KeycloakToken keycloakToken)
+  public static Header createAuthorizationHeader(final KeycloakToken keycloakToken)
   {
-    return "Bearer " + keycloakToken.getToken();
+    return new BasicHeader(AUTHORIZATION_HEADER,"Bearer " + keycloakToken.getToken());
   }
 }

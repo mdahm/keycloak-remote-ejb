@@ -5,7 +5,7 @@ import static org.keycloak.example.Util.KEYCLOAK_CLIENT;
 import static org.keycloak.example.Util.KEYCLOAK_REALM;
 import static org.keycloak.example.Util.KEYCLOAK_SECRET;
 import static org.keycloak.example.Util.USERINFO_PATH;
-import static org.keycloak.example.Util.createAuthorizationValue;
+import static org.keycloak.example.Util.createAuthorizationHeader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -53,7 +53,7 @@ public class DirectGrantInvoker
   {
     final HttpGet httpGet = new HttpGet(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
         .path(USERINFO_PATH).queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(KEYCLOAK_REALM));
-    httpGet.addHeader(AUTHORIZATION_HEADER, createAuthorizationValue(keycloakToken));
+    httpGet.addHeader(createAuthorizationHeader(keycloakToken));
 
     return checkResponse(_httpClient, httpGet);
   }

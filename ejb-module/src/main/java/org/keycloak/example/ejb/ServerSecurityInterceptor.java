@@ -5,7 +5,7 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.keycloak.example.Util.AUTHORIZATION_HEADER;
 import static org.keycloak.example.Util.KEYCLOAK_SECRET;
 import static org.keycloak.example.Util.USERINFO_PATH;
-import static org.keycloak.example.Util.createAuthorizationValue;
+import static org.keycloak.example.Util.createAuthorizationHeader;
 
 import java.io.IOException;
 import java.net.URI;
@@ -113,7 +113,7 @@ public class ServerSecurityInterceptor
     final URI userInfoUri = KeycloakUriBuilder.fromUri(authServerBaseUrl).path(USERINFO_PATH)
         .queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(deployment.getRealm());
     final HttpGet request = new HttpGet(userInfoUri);
-    request.addHeader(AUTHORIZATION_HEADER, createAuthorizationValue(keycloakToken));
+    request.addHeader(createAuthorizationHeader(keycloakToken));
     final HttpResponse response = client.execute(request);
     final int status = response.getStatusLine().getStatusCode();
     final HttpEntity entity = response.getEntity();
