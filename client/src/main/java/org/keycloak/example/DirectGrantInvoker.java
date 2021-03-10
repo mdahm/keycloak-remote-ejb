@@ -1,5 +1,12 @@
 package org.keycloak.example;
 
+import static org.keycloak.example.Util.AUTHORIZATION_HEADER;
+import static org.keycloak.example.Util.KEYCLOAK_CLIENT;
+import static org.keycloak.example.Util.KEYCLOAK_REALM;
+import static org.keycloak.example.Util.KEYCLOAK_SECRET;
+import static org.keycloak.example.Util.USERINFO_PATH;
+import static org.keycloak.example.Util.createAuthorizationValue;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -21,7 +28,6 @@ import org.keycloak.common.VerificationException;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.common.util.StreamUtil;
 import org.keycloak.constants.ServiceUrlConstants;
-import org.keycloak.example.KeycloakToken;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.util.JsonSerialization;
@@ -31,12 +37,7 @@ import org.keycloak.util.JsonSerialization;
  */
 public class DirectGrantInvoker
 {
-  private static final String USERINFO = "/realms/{realm-name}/protocol/openid-connect/userinfo";
-
   private static final String KEYCLOAK_ROOT = "http://localhost:8080/auth";
-  private static final String KEYCLOAK_REALM = "ejb-demo";
-  private static final String KEYCLOAK_CLIENT = "ejb-client";
-  private static final String KEYCLOAK_SECRET = "6ec720af-70dd-4b7b-8a1f-876f7a42c3b7";
 
   private final CloseableHttpClient _httpClient = HttpClientBuilder.create().build();
   private final String username;
@@ -51,8 +52,8 @@ public class DirectGrantInvoker
   public String getUserinfo(final KeycloakToken keycloakToken) throws IOException
   {
     final HttpGet httpGet = new HttpGet(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
-        .path(USERINFO).build(KEYCLOAK_REALM));
-    httpGet.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
+        .path(USERINFO_PATH).queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(KEYCLOAK_REALM));
+    httpGet.addHeader(AUTHORIZATION_HEADER, createAuthorizationValue(keycloakToken));
 
     return checkResponse(_httpClient, httpGet);
   }
@@ -63,9 +64,9 @@ public class DirectGrantInvoker
     final HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
         .path(ServiceUrlConstants.TOKEN_PATH).build(KEYCLOAK_REALM));
     final List<NameValuePair> formparams = new ArrayList<>();
-    formparams.add(new BasicNameValuePair("username", username));
-    formparams.add(new BasicNameValuePair("password", password));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE, "password"));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, username));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.PASSWORD, password));
+    formparams.add(new BasicNameValuePair(OAuth2Constants.GRANT_TYPE, OAuth2Constants.PASSWORD));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, KEYCLOAK_CLIENT));
     formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
