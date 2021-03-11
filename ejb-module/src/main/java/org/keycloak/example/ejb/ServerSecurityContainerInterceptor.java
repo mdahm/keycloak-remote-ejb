@@ -17,9 +17,9 @@ import org.keycloak.example.KeycloakToken;
  * Container interceptors are specific to JBoss:
  * https://docs.jboss.org/author/display/WFLY/Container%20interceptors.html
  *
- * It is in front of the call chain, dependency injection thus does not work here
+ * It is in front of the call chain, dependency injection thus does not work here.
  *
- * Is registered in jboss-ejb3.xml...
+ * It is registered in jboss-ejb3.xml.
  */
 public class ServerSecurityContainerInterceptor
 {
@@ -35,7 +35,7 @@ public class ServerSecurityContainerInterceptor
       final KeycloakToken keycloakToken = (KeycloakToken) contextData.get(KeycloakToken.TOKEN_KEY);
       ContextStateCache stateCache = null;
 
-      LOGGER.info("Successfully found KeycloakToken passed from client");
+      LOGGER.info("Found KeycloakToken passed from client");
 
       try
       {
@@ -70,7 +70,7 @@ public class ServerSecurityContainerInterceptor
     }
     else
     {
-      LOGGER.warn("No Keycloak token found!");
+      LOGGER.warn("No Keycloak token found for " + invocationContext.getMethod());
       return invocationContext.proceed();
     }
   }

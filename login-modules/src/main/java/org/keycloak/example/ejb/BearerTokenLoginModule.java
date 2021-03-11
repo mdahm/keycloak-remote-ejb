@@ -12,7 +12,6 @@ import org.jboss.logging.Logger;
 import org.keycloak.adapters.jaas.AbstractKeycloakLoginModule;
 import org.keycloak.common.VerificationException;
 import org.keycloak.example.KeyCloakDeploymentHolder;
-import org.keycloak.representations.adapters.config.AdapterConfig;
 
 import javax.enterprise.inject.spi.BeanManager;
 
@@ -27,11 +26,7 @@ import javax.enterprise.inject.spi.BeanManager;
  */
 public class BearerTokenLoginModule extends AbstractKeycloakLoginModule
 {
-  private static final Logger log = Logger.getLogger(BearerTokenLoginModule.class);
-
-  public static final String AUTH_SERVER_URL = "auth-server-url";
-  public static final String REALM = "realm";
-  public static final String RESOURCE = "resource";
+  private static final Logger LOGGER = Logger.getLogger(BearerTokenLoginModule.class);
 
   @Override
   public void initialize(final Subject subject, final CallbackHandler callbackHandler, final Map<String, ?> sharedState,
@@ -41,26 +36,13 @@ public class BearerTokenLoginModule extends AbstractKeycloakLoginModule
 
     final KeyCloakDeploymentHolder holder = lookupDeploymentHolderBean();
 
-    if (deployment != null)
+    if (deployment != null && holder != null)
     {
-      if (options.containsKey(AUTH_SERVER_URL))
-      {
-        final AdapterConfig config = new AdapterConfig();
-        config.setAuthServerUrl((String) options.get(AUTH_SERVER_URL));
-        deployment.setAuthServerBaseUrl(config);
-      }
-
-      if (options.containsKey(REALM))
-      {
-        deployment.setRealm((String) options.get(REALM));
-      }
-
-      if (options.containsKey(RESOURCE))
-      {
-        deployment.setResourceName((String) options.get(RESOURCE));
-      }
-
       holder.setKeycloakDeployment(deployment);
+    }
+    else
+    {
+      LOGGER.error("Could NOT put KeyCloak deployment into CDI context!!");
     }
   }
 
@@ -82,6 +64,6 @@ public class BearerTokenLoginModule extends AbstractKeycloakLoginModule
   @Override
   protected Logger getLogger()
   {
-    return log;
+    return LOGGER;
   }
 }

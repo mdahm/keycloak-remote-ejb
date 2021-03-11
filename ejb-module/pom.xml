@@ -26,6 +26,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Debug org.jboss.as.ejb3.security.SecurityContextInterceptor -->
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-security</artifactId>
+            <version>${version.wildfly.bom}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Import the EJB API, we use provided scope as the API is included in WildFly -->
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>

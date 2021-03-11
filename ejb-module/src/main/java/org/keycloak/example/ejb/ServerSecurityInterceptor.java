@@ -2,7 +2,6 @@ package org.keycloak.example.ejb;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
-import static org.keycloak.example.Util.AUTHORIZATION_HEADER;
 import static org.keycloak.example.Util.KEYCLOAK_SECRET;
 import static org.keycloak.example.Util.USERINFO_PATH;
 import static org.keycloak.example.Util.createAuthorizationHeader;
@@ -10,8 +9,6 @@ import static org.keycloak.example.Util.createAuthorizationHeader;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -21,18 +18,13 @@ import javax.interceptor.InvocationContext;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.adapters.KeycloakDeployment;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.common.util.StreamUtil;
-import org.keycloak.constants.ServiceUrlConstants;
 import org.keycloak.example.KeyCloakDeploymentHolder;
 import org.keycloak.example.KeycloakToken;
 
@@ -80,31 +72,31 @@ public class ServerSecurityInterceptor
 
   // TODO
 
-  public void logout(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
-  {
-    final HttpClient client = deployment.getClient();
-    final String authServerBaseUrl = deployment.getAuthServerBaseUrl();
-    final HttpPost request = new HttpPost(KeycloakUriBuilder.fromUri(authServerBaseUrl)
-        .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(deployment.getRealm()));
-    final List<NameValuePair> formparams = new ArrayList<>();
-    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, deployment.getResourceName()));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, keycloakToken.getUsername()));
-    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
-    final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
-
-    request.setEntity(form);
-
-    // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
-
-    final HttpResponse response = client.execute(request);
-    final int status = response.getStatusLine().getStatusCode();
-    final HttpEntity entity = response.getEntity();
-    final boolean validEntity = entity != null && entity.getContent() != null;
-    final String body = validEntity ? StreamUtil.readString(entity.getContent(), Charset.defaultCharset()) : "";
-
-    LOGGER.info("Response body: " + body);
-  }
+//  public void logout(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
+//  {
+//    final HttpClient client = deployment.getClient();
+//    final String authServerBaseUrl = deployment.getAuthServerBaseUrl();
+//    final HttpPost request = new HttpPost(KeycloakUriBuilder.fromUri(authServerBaseUrl)
+//        .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(deployment.getRealm()));
+//    final List<NameValuePair> formparams = new ArrayList<>();
+//    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, deployment.getResourceName()));
+//    formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
+//    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, keycloakToken.getUsername()));
+//    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
+//    final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
+//
+//    request.setEntity(form);
+//
+//    // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
+//
+//    final HttpResponse response = client.execute(request);
+//    final int status = response.getStatusLine().getStatusCode();
+//    final HttpEntity entity = response.getEntity();
+//    final boolean validEntity = entity != null && entity.getContent() != null;
+//    final String body = validEntity ? StreamUtil.readString(entity.getContent(), Charset.defaultCharset()) : "";
+//
+//    LOGGER.info("Response body: " + body);
+//  }
 
   private void validateToken(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
   {
@@ -125,11 +117,11 @@ public class ServerSecurityInterceptor
     switch (status)
     {
     case SC_UNAUTHORIZED:
-      throw new IOException("Unauthorized request: " + body);
+      throw new SecurityException("Unauthorized request: " + body);
     case SC_OK:
       return;
     default:
-      throw new IOException("Invalid response from Server: Status " + status);
+      throw new SecurityException("Invalid response from Server: Status " + status);
     }
   }
 }

@@ -32,9 +32,8 @@ How to have this running
                     <authentication>
                         <login-module code="org.keycloak.example.ejb.BearerTokenLoginModule" flag="required">
                             <module-option name="keycloak-config-file" value="classpath:/keycloak-ejb.json"/>
-                            <module-option name="auth-server-url" value="http://localhost:8080/auth"/>
-                            <module-option name="realm" value="ejb-demo"/>
                         </login-module>
+   
                         <login-module code="org.keycloak.example.ejb.ConvertKeycloakRolesLoginModule" flag="required"/>
                     </authentication>
                 </security-domain>

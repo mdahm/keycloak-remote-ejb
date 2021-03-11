@@ -29,7 +29,7 @@ import org.keycloak.representations.AccessToken;
 @SuppressWarnings("rawtypes")
 @Stateless
 @Remote(RemoteHello.class)
-@RolesAllowed({ "user" })
+@RolesAllowed({ "user", "UBI_ENTWICKLER" })
 @SecurityDomain("keycloak-ejb")
 @Interceptors({ ServerSecurityInterceptor.class })
 public class HelloBean implements RemoteHello
