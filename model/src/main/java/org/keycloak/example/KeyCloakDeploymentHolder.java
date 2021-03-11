@@ -6,7 +6,6 @@ import javax.inject.Named;
 import org.keycloak.adapters.KeycloakDeployment;
 
 @ApplicationScoped
-@javax.faces.bean.ApplicationScoped
 @Named(KeyCloakDeploymentHolder.NAME)
 public class KeyCloakDeploymentHolder
 {

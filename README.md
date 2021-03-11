@@ -56,9 +56,9 @@ Call chain order:
 
 1. ServerSecurityContainerInterceptor
 2. SecurityInterceptor (JBossCachedAuthenticationManager)
-3. BearerTokenLoginModule checks/verifies Token
+3. BearerTokenLoginModule checks/verifies Token offline
 4. ConvertKeycloakRolesLoginModule adds roles to subject
-5. ServerSecurityInterceptor
+5. ServerSecurityInterceptor checks/verifies Token online once
 6. Bean
 
 # Secure application????

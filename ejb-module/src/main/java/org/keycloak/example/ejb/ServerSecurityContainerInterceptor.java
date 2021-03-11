@@ -13,12 +13,12 @@ import org.keycloak.example.KeycloakToken;
 
 /**
  * The server side security interceptor responsible for handling any security token propagated from the client.
- *
+ * <p>
  * Container interceptors are specific to JBoss:
  * https://docs.jboss.org/author/display/WFLY/Container%20interceptors.html
- *
+ * <p>
  * It is in front of the call chain, dependency injection thus does not work here.
- *
+ * <p>
  * It is registered in jboss-ejb3.xml.
  */
 public class ServerSecurityContainerInterceptor
@@ -47,8 +47,7 @@ public class ServerSecurityContainerInterceptor
           final String accessToken = keycloakToken.getToken();
 
           stateCache = SecurityActions.pushIdentity(userPrincipal, accessToken);
-          LOGGER.infof("Successfully pushed userPrincipal %s with roles %s his credential", userPrincipal.getName(),
-              keycloakToken.getRoles());
+          LOGGER.infof("Pushed userPrincipal %s with roles %s", userPrincipal.getName(), keycloakToken.getRoles());
         }
         catch (Exception e)
         {
