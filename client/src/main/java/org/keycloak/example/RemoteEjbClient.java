@@ -38,7 +38,7 @@ public class RemoteEjbClient
     // Step 2 : Keycloak DirectGrant (OAuth2 Resource Owner Password Credentials Grant) from the application
     final DirectGrantInvoker directGrant = new DirectGrantInvoker(usernamePassword.username, usernamePassword.password);
     final KeycloakToken keycloakToken1 = directGrant.authenticate();
-    System.out.println("Successfully authenticated against Keycloak and retrieved token");
+    System.out.println("Successfully authenticated against Keycloak " + keycloakToken1);
     System.out.println("User-Info 1:" + directGrant.getUserinfo(keycloakToken1));
 
     // Step 3 : Push credentials to clientContext from where ClientInterceptor can retrieve them

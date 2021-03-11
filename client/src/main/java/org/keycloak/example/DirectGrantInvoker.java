@@ -69,7 +69,8 @@ public class DirectGrantInvoker
   }
 
   @SuppressWarnings("unchecked")
-  private KeycloakToken obtainKeycloakToken(final String grantType, final String credential) throws IOException, VerificationException
+  private KeycloakToken obtainKeycloakToken(final String grantType, final String credential)
+      throws IOException, VerificationException
   {
     final HttpPost post = new HttpPost(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
         .path(ServiceUrlConstants.TOKEN_PATH).build(KEYCLOAK_REALM));
@@ -85,9 +86,11 @@ public class DirectGrantInvoker
     final String json = checkResponse(_httpClient, post);
     final AccessTokenResponse accessTokenResponse = JsonSerialization.readValue(json, AccessTokenResponse.class);
     final AccessToken accessToken = TokenVerifier.create(accessTokenResponse.getToken(), AccessToken.class).getToken();
-    final List<String> roles = (List<String>) accessToken.getOtherClaims().get("Roles");
 
-    return new KeycloakToken(accessToken.getPreferredUsername(), roles, accessTokenResponse.getToken(),
+    // Needs to be configured via "User Realm Role" mapper
+    //    final List<String> roles = (List<String>) accessToken.getOtherClaims().get("Roles");
+
+    return new KeycloakToken(accessToken.getPreferredUsername(), accessToken.getRealmAccess().getRoles(), accessTokenResponse.getToken(),
         accessTokenResponse.getRefreshToken());
   }
 
@@ -120,7 +123,7 @@ public class DirectGrantInvoker
     final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
 
     request.setEntity(form);
-//    request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
+    //    request.addHeader("Authorization", "Bearer " + keycloakToken.getToken());
 
     // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
 
