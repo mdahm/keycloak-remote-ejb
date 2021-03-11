@@ -1,13 +1,13 @@
 package org.keycloak.example;
 
-import static org.keycloak.example.Util.AUTHORIZATION_HEADER;
 import static org.keycloak.example.Util.KEYCLOAK_CLIENT;
 import static org.keycloak.example.Util.KEYCLOAK_REALM;
 import static org.keycloak.example.Util.KEYCLOAK_SECRET;
 import static org.keycloak.example.Util.USERINFO_PATH;
-import static org.keycloak.example.Util.createAuthorizationHeader;
+import static org.keycloak.example.Util.createUserInfoRequest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +51,11 @@ public class DirectGrantInvoker
 
   public String getUserinfo(final KeycloakToken keycloakToken) throws IOException
   {
-    final HttpGet httpGet = new HttpGet(KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
-        .path(USERINFO_PATH).queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(KEYCLOAK_REALM));
-    httpGet.addHeader(createAuthorizationHeader(keycloakToken));
+    final URI userInfoUri = KeycloakUriBuilder.fromUri(KEYCLOAK_ROOT)
+        .path(USERINFO_PATH).queryParam(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET).build(KEYCLOAK_REALM);
+    final HttpGet request = createUserInfoRequest(userInfoUri, keycloakToken);
 
-    return checkResponse(_httpClient, httpGet);
+    return checkResponse(_httpClient, request);
   }
 
   public KeycloakToken authenticate() throws IOException, VerificationException

@@ -1,6 +1,8 @@
 package org.keycloak.example;
 
-import org.apache.http.Header;
+import java.net.URI;
+
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.message.BasicHeader;
 
 public abstract class Util
@@ -15,8 +17,10 @@ public abstract class Util
   public static final String KEYCLOAK_CLIENT = "ejb-client";
   public static final String AUTHORIZATION_HEADER = "Authorization";
 
-  public static Header createAuthorizationHeader(final KeycloakToken keycloakToken)
+  public static HttpGet createUserInfoRequest(final URI userInfoUri, final KeycloakToken keycloakToken)
   {
-    return new BasicHeader(AUTHORIZATION_HEADER,"Bearer " + keycloakToken.getToken());
+    final HttpGet request = new HttpGet(userInfoUri);
+    request.addHeader(new BasicHeader(AUTHORIZATION_HEADER,"Bearer " + keycloakToken.getToken()));
+    return request;
   }
 }
