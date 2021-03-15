@@ -11,8 +11,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.ejb.client.EJBClientContext;
-import org.keycloak.example.ejb.HelloBean;
 import org.keycloak.example.ejb.RemoteHello;
+import org.keycloak.example.ejb.RemoteUserSession;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -75,8 +75,11 @@ public class RemoteEjbClient
     try
     {
       // Step 4 : EJB invoke
-      final RemoteHello remoteHello = lookupRemoteStatelessHello();
+      final RemoteHello remoteHello = lookupRemoteStatelessHello(RemoteHello.class, RemoteHello.NAME);
+      final RemoteUserSession remoteUser = lookupRemoteStatelessHello(RemoteUserSession.class, RemoteUserSession.NAME);
       System.out.println("Obtained RemoteHello for invocation");
+
+      remoteUser.login();
 
       System.out.println("Going to invoke EJB");
       final String hello = remoteHello.helloSimple();
@@ -85,7 +88,7 @@ public class RemoteEjbClient
       final String hello2 = remoteHello.helloAdvanced();
       System.out.println("HelloAdvanced invocation: " + hello2);
 
-      remoteHello.logout();
+      remoteUser.logout();
     }
     finally
     {
@@ -95,26 +98,11 @@ public class RemoteEjbClient
     return null;
   }
 
-  private static UsernamePasswordHolder promptUsernamePassword() throws IOException
-  {
-    System.out.println(
-        "Remote EJB client will ask for your username and password and then authenticate against Keycloak and call EJB.");
-
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)))
-    {
-      System.out.print("Username: ");
-      String username = reader.readLine();
-      System.out.print("Password: ");
-      String password = reader.readLine();
-
-      return new UsernamePasswordHolder(username, password);
-    }
-  }
-
   /**
    * Looks up and returns the proxy to remote stateless calculator bean
    */
-  private static RemoteHello lookupRemoteStatelessHello() throws NamingException
+  @SuppressWarnings("unchecked")
+  private static <T> T lookupRemoteStatelessHello(final Class<T> remoteInterface, final String beanName) throws NamingException
   {
     final Hashtable<String, Object> jndiProperties = new Hashtable<>();
     jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
@@ -126,42 +114,31 @@ public class RemoteEjbClient
       // without the .ear suffix. However, the application name could be overridden in the application.xml of the
       // EJB deployment on the server.
       // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
-      final String appName = "keycloak-remote-ejb";
+      final String appName = "ear-0.1-SNAPSHOT";
+//      final String appName = "keycloak-remote-ejb";
       // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
       // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
       // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
       // jboss-as-ejb-remote-app
       final String moduleName = "org.keycloak.example-ejb-module-0.1-SNAPSHOT";
-      // AS7 allows each deployment to have an (optional) distinct name. We haven't specified a distinct name for
-      // our EJB deployment, so this is an empty string
-      final String distinctName = "";
-      // The EJB name which by default is the simple class name of the bean implementation class
-      final String beanName = HelloBean.class.getSimpleName();
       // the remote view fully qualified class name
-      final String viewClassName = RemoteHello.class.getName();
+      final String viewClassName = remoteInterface.getName();
       // let's do the lookup
       final String lookupKey = "ejb:"
           + appName
           + "/"
           + moduleName
           + "/"
-          + buildDistinctPath(distinctName)
           + beanName
           + "!"
           + viewClassName;
 
-      System.out.println("Lookup for remote EJB bean: " + lookupKey);
-      return (RemoteHello) context.lookup(lookupKey);
+      return (T) context.lookup(lookupKey);
     }
     finally
     {
       context.close();
     }
-  }
-
-  private static String buildDistinctPath(final String distinctName)
-  {
-    return distinctName.isEmpty() ? "" : distinctName + "/";
   }
 
   private static class UsernamePasswordHolder

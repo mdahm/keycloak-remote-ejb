@@ -2,6 +2,7 @@ package org.keycloak.example.ejb;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.keycloak.example.KeycloakToken.TOKEN_KEY;
 import static org.keycloak.example.Util.KEYCLOAK_SECRET;
 import static org.keycloak.example.Util.USERINFO_PATH;
 import static org.keycloak.example.Util.createUserInfoRequest;
@@ -46,9 +47,9 @@ public class ServerSecurityInterceptor
 
     final Map<String, Object> contextData = invocationContext.getContextData();
 
-    if (contextData.containsKey(KeycloakToken.TOKEN_KEY))
+    if (contextData.containsKey(TOKEN_KEY))
     {
-      final KeycloakToken keycloakToken = (KeycloakToken) contextData.get(KeycloakToken.TOKEN_KEY);
+      final KeycloakToken keycloakToken = (KeycloakToken) contextData.get(TOKEN_KEY);
       final boolean validate = keyCloakTokenStore.registerToken(keycloakToken);
 
       if (validate)
@@ -66,37 +67,39 @@ public class ServerSecurityInterceptor
         }
       }
     }
+    else
+    {
+      throw new IllegalStateException("Cannot find " + TOKEN_KEY + " in context data");
+    }
 
     return invocationContext.proceed();
   }
 
-  // TODO
-
-//  public void logout(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
-//  {
-//    final HttpClient client = deployment.getClient();
-//    final String authServerBaseUrl = deployment.getAuthServerBaseUrl();
-//    final HttpPost request = new HttpPost(KeycloakUriBuilder.fromUri(authServerBaseUrl)
-//        .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(deployment.getRealm()));
-//    final List<NameValuePair> formparams = new ArrayList<>();
-//    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, deployment.getResourceName()));
-//    formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
-//    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, keycloakToken.getUsername()));
-//    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
-//    final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
-//
-//    request.setEntity(form);
-//
-//    // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
-//
-//    final HttpResponse response = client.execute(request);
-//    final int status = response.getStatusLine().getStatusCode();
-//    final HttpEntity entity = response.getEntity();
-//    final boolean validEntity = entity != null && entity.getContent() != null;
-//    final String body = validEntity ? StreamUtil.readString(entity.getContent(), Charset.defaultCharset()) : "";
-//
-//    LOGGER.info("Response body: " + body);
-//  }
+  //  public void logout(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
+  //  {
+  //    final HttpClient client = deployment.getClient();
+  //    final String authServerBaseUrl = deployment.getAuthServerBaseUrl();
+  //    final HttpPost request = new HttpPost(KeycloakUriBuilder.fromUri(authServerBaseUrl)
+  //        .path(ServiceUrlConstants.TOKEN_SERVICE_LOGOUT_PATH).build(deployment.getRealm()));
+  //    final List<NameValuePair> formparams = new ArrayList<>();
+  //    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_ID, deployment.getResourceName()));
+  //    formparams.add(new BasicNameValuePair(OAuth2Constants.REFRESH_TOKEN, keycloakToken.getRefreshToken()));
+  //    formparams.add(new BasicNameValuePair(OAuth2Constants.USERNAME, keycloakToken.getUsername()));
+  //    formparams.add(new BasicNameValuePair(OAuth2Constants.CLIENT_SECRET, KEYCLOAK_SECRET));
+  //    final UrlEncodedFormEntity form = new UrlEncodedFormEntity(formparams, "UTF-8");
+  //
+  //    request.setEntity(form);
+  //
+  //    // https://stackoverflow.com/questions/48274251/keycloak-access-token-validation-end-point
+  //
+  //    final HttpResponse response = client.execute(request);
+  //    final int status = response.getStatusLine().getStatusCode();
+  //    final HttpEntity entity = response.getEntity();
+  //    final boolean validEntity = entity != null && entity.getContent() != null;
+  //    final String body = validEntity ? StreamUtil.readString(entity.getContent(), Charset.defaultCharset()) : "";
+  //
+  //    LOGGER.info("Response body: " + body);
+  //  }
 
   private void validateToken(final KeycloakDeployment deployment, final KeycloakToken keycloakToken) throws IOException
   {

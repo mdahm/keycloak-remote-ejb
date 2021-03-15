@@ -7,9 +7,9 @@ import java.io.IOException;
  */
 public interface RemoteHello
 {
-  String helloSimple() throws IOException;
+  String NAME = "Hello";
 
-  void logout() throws IOException;
+  String helloSimple() throws IOException;
 
   String helloAdvanced() throws IOException;
 }

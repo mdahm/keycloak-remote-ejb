@@ -14,7 +14,7 @@ public class KeycloakToken implements Serializable
 {
   private static final long serialVersionUID = 1L;
 
-  public static final String TOKEN_KEY = "tokenKey";
+  public static final String TOKEN_KEY = "de.bwb.kanal.ubi.tokenKey";
 
   private final String username;
   private final Set<String> roles;
