@@ -1,14 +1,16 @@
 # Prerequisites
 
-* Install keycloak-adapter in WildFly
-* Install security domain with CLI script
-* Deploy KeyCloak WAR from keycloak-web project
+* Download & install WildFly
+* Install keycloak-adapter in WildFly (keycloak-oidc-wildfly-adapter-12.0.4.zip)
+* Install security domain with CLI script (install-security-domain.cli)
+* Deploy KeyCloak WAR from keycloak-web project (https://github.com/akquinet/keycloak-web)
+* Import realm from file `testrealm.json` in KeyCloak dmin Console
+* Deploy WAR from this project
+* Run the client `RemoteEjbClient`
 
+# How it works
 
-
-This shows how to create remote EJB beans secured by Keycloak.
-
-There is remote EJB client, which first asks user for his username+password and then authenticate against RHSSO/Keycloak server via
+There is remote EJB client, which authenticates against RHSSO/Keycloak server via
 Direct Grant (OAuth2 Resource Owner Password Credential Grant). It sets the Keycloak accessToken to the EJB context (with usage of ClientInterceptor) and invokes remote EJB.
 
 The server-side is remote EJB bean, which retrieves the token from the EJB Context passed from client and put it to the Wildfly SecurityContext where JAAS 
@@ -16,23 +18,8 @@ will find it (ServerSecurityInterceptor). JAAS realm will authenticate the token
 add needed GroupPrincipal, which is "known" to Wildfly, so that it can authorize EJB. Authenticated user with `user` role is able to invoke EJB.
 
 
-How to have this running
+## Security domain
 ------------------------
-1. This example assumes Keycloak demo distribution downloaded somewhere ( will be referenced by $KEYCLOAK_DEMO ). It shouldn't be a problem
- to use separate RHSSO/Keycloak server and separate Wildfly server with installed Keycloak adapter though.
- 
- 
-2. Build this project with: 
-    ````
-    mvn clean install
-    ````
-
-3. Deploy remote ejb to the wildfly server. 
-    ````
-    cp ejb-module/target/ejb-module.jar $KEYCLOAK_DEMO_HOME/keycloak/standalone/deployment
-    ````
-
-4. Add new security-domain to the security-domains inside the file `$KEYCLOAK_DEMO_HOME/keycloak/standalone/configuration/standalone.xml`:
     ````
                 <security-domain name="keycloak-ejb">
                     <authentication>
@@ -44,22 +31,11 @@ How to have this running
                     </authentication>
                 </security-domain>
     ````
-
-5. Run the keycloak server
-
-6. Create admin user in Keycloak and login to admin console (See Keycloak/RHSSO docs for details).
-
-7. In keycloak admin console, import realm from file `testrealm.json` .
-
-8. Run the client `RemoteEjbClient` 
-
-If you login as user `john` with password `password`, you should be able to see that both EJB methods were successfully invoked.
-When login as `mary` with password `password`, you should see the exception due to missing role `user` .
-
 # Call chain
 
 Call chain order:
 
+0. ClientInterceptor
 1. ServerSecurityContainerInterceptor
 2. SecurityInterceptor (JBossCachedAuthenticationManager)
 3. BearerTokenLoginModule checks/verifies Token offline
