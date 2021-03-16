@@ -1,4 +1,10 @@
-# keycloak-remote-ejb
+# Prerequisites
+
+* Install keycloak-adapter in WildFly
+* Install security domain with CLI script
+* Deploy KeyCloak WAR from keycloak-web project
+
+
 
 This shows how to create remote EJB beans secured by Keycloak.
 
@@ -60,20 +66,3 @@ Call chain order:
 4. ConvertKeycloakRolesLoginModule adds roles to subject
 5. ServerSecurityInterceptor checks/verifies Token online once
 6. Bean
-
-# Secure application????
-
-    <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
-            <secure-deployment name="ejb-module.jar">
-                <realm>ejb-demo</realm>
-                <resource>ejb-client</resource>
-                <use-resource-role-mappings>false</use-resource-role-mappings>
-                <public-client>true</public-client>
-                <auth-server-url>http://localhost:8080/auth/</auth-server-url>
-                <ssl-required>EXTERNAL</ssl-required>
-                <verify-token-audience>true</verify-token-audience>
-            </secure-deployment>
-        </subsystem>
-
-
-“DirectAccessGrantsLoginModule”, but nothing mentioned on “KeycloakLoginModule

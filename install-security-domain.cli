@@ -1,0 +1,19 @@
+embed-server --server-config=standalone.xml --std-out=echo
+batch
+
+/subsystem=security/security-domain=keycloak-ejb:add
+
+/subsystem=security/security-domain=keycloak-ejb/authentication=classic:add( \
+login-modules=[{ \
+        code="org.keycloak.example.ejb.BearerTokenLoginModule", \
+        flag="required",\
+        module-options={"keycloak-config-file" => "classpath:/keycloak-ejb.json"} \
+    }, \
+    { \
+        code="org.keycloak.example.ejb.ConvertKeycloakRolesLoginModule", \
+        flag="required" \
+    } \
+    ]
+
+run-batch
+stop-embedded-server
