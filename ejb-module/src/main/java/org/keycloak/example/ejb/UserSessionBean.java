@@ -10,7 +10,6 @@ import javax.ejb.Stateless;
 import javax.security.auth.Subject;
 
 import org.jboss.security.SimplePrincipal;
-import org.jboss.ejb3.annotation.SecurityDomain;
 import org.jboss.logging.Logger;
 import org.jboss.security.AuthenticationManager;
 import org.jboss.security.SecurityContext;
@@ -19,7 +18,8 @@ import org.keycloak.adapters.jaas.RolePrincipal;
 
 @Stateless(name = RemoteUserSession.NAME)
 @Remote(RemoteUserSession.class)
-@SecurityDomain("keycloak-ejb")
+// Necessary, if not configured via jboss-app.xml
+//@SecurityDomain("keycloak-ejb")
 @PermitAll
 @SuppressWarnings("rawtypes")
 public class UserSessionBean extends AbstractBean implements RemoteUserSession

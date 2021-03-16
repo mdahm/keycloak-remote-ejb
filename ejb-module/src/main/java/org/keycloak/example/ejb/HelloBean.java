@@ -23,7 +23,7 @@ import org.keycloak.representations.AccessToken;
 @Stateless(name = RemoteHello.NAME)
 @Remote(RemoteHello.class)
 @RolesAllowed({ "user", "UBI_ENTWICKLER" })
-@SecurityDomain("keycloak-ejb")
+//@SecurityDomain("keycloak-ejb")
 public class HelloBean extends AbstractBean implements RemoteHello
 {
   @Override

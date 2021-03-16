@@ -3,6 +3,7 @@ package org.keycloak.example.ejb;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.security.PermitAll;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
@@ -12,6 +13,7 @@ import org.jboss.logging.Logger;
 
 @Singleton
 @Lock(LockType.WRITE)
+@PermitAll
 public class KeyCloakTokenStore
 {
   private static final Logger LOGGER = Logger.getLogger(KeyCloakTokenStore.class);
