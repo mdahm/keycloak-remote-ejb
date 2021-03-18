@@ -137,14 +137,13 @@ public class RemoteEjbClient
       // The app name is the application name of the deployed EJBs. This is typically the ear name
       // without the .ear suffix. However, the application name could be overridden in the application.xml of the
       // EJB deployment on the server.
-      // Since we haven't deployed the application as a .ear, the app name for us will be an empty string
-      final String appName = "ear-0.1-SNAPSHOT";
+      final String appName = "keycloak-remote-ejb";
       //      final String appName = "keycloak-remote-ejb";
       // This is the module name of the deployed EJBs on the server. This is typically the jar name of the
       // EJB deployment, without the .jar suffix, but can be overridden via the ejb-jar.xml
       // In this example, we have deployed the EJBs in a jboss-as-ejb-remote-app.jar, so the module name is
       // jboss-as-ejb-remote-app
-      final String moduleName = "org.keycloak.example-ejb-module-0.1-SNAPSHOT";
+      final String moduleName = "ejb-module";
       // the remote view fully qualified class name
       final String viewClassName = remoteInterface.getName();
       // let's do the lookup
